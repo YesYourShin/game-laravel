@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WordController extends Controller
 {
@@ -80,5 +81,39 @@ class WordController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function play()
+    {
+        $count = DB::table('cards')->count();
+        $randomNumber = mt_rand(1, $count);
+        $otherNumber = [];
+
+        $n = 1;
+        while($n < 4) {
+            $rdn = mt_rand(1, $count);
+            if($rdn === $randomNumber || in_array($rdn, $otherNumber)) {
+                continue;
+            }
+            array_push($otherNumber, $rdn);
+            $n++;
+        }
+
+        $correct = DB::table('cards')
+            ->where('id', '=', $randomNumber)
+            ->get();
+
+        $wrong = DB::table('cards')
+            ->orWhere('id', '=', $otherNumber[0])
+            ->orWhere('id', '=', $otherNumber[1])
+            ->orWhere('id', '=', $otherNumber[2])
+            ->get();
+
+        $response = array(
+            "correct" => $correct,
+            "wrong" => $wrong
+        );
+
+        return json_encode($response);
     }
 }

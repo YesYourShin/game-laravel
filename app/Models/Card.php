@@ -21,6 +21,6 @@ class Card extends Model
         'atk',
         'def',
         'species',
-        'p_scale'
+        'p_scale',
     ];
 }
